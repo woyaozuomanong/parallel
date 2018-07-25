@@ -8,11 +8,15 @@
 #include<stdio.h>
 #include<omp.h>
 #include<math.h>
+#include <sys/time.h>
+
 #define MAX 10000
 double a[MAX][MAX],b[MAX][MAX],c[MAX][MAX];
 
 int main()
 {
+	struct timeval start,end;
+	gettimeofday(&start,NULL);
 #pragma oepnmp parallel for
 	for(int i=0;i<MAX;i++)
 	{
@@ -23,4 +27,9 @@ int main()
 			c[i][j]=a[i][j]+b[i][j];
 		}
 	}
+	gettimeofday(&end,NULL);
+
+	int timeuse=1000000*(end.tv_sec-start.tv_sec)+end.tv_usec-start.tv_usec;
+	printf("time:%d us\n",timeuse);
+	return 0;
 }
