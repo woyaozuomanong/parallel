@@ -17,7 +17,7 @@ int main()
 {
 	struct timeval start,end;
 	gettimeofday(&start,NULL);
-#pragma oepnmp parallel for
+#pragma omp parallel for
 	for(int i=0;i<MAX;i++)
 	{
 		for(int j=0;j<MAX;j++)
