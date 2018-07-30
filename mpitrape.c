@@ -7,19 +7,19 @@
 
 #include<stdio.h>
 #include<mpi/mpi.h>
-
+#include<math.h>
 double Trap(double left_endpt,double right_endpt,int trap_count,double base_len);
 
 int main(void)
 {
     int my_rank,comm_sz,n=1024,local_n;
-    double a=0,b=3,h,local_a,local_b;
+    double a=0,b=3.14,h,local_a,local_b;
     double local_int,total_int;
     int source;
 
     MPI_Init(NULL,NULL);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
-    MPi_Comm_size(MPI_COMM_WORLD,&comm_sz);
+    MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
 
     h=(b-a)/n;
     local_n=n/comm_sz;
@@ -58,11 +58,11 @@ double Trap(double left_endpt,double right_endpt,int trap_count,double base_len)
     double estimate,x;
     int i;
 
-    estimate=(f(left_endpt)+f(right_endpt))/2.0;
+    estimate=(sin(left_endpt)+sin(right_endpt))/2.0;
     for(i=1;i<=trap_count-1;i++)
     {
         x=left_endpt+i*base_len;
-        estimate+=f(x);
+        estimate+=sin(x);
     }
     estimate=estimate*base_len;
 
