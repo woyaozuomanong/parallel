@@ -28,8 +28,11 @@ int main(void)
     local_a=a+my_rank*local_n*h;
     local_b=local_a+local_n*h;
     local_int=Trap(local_a,local_b,local_n,h);
-
-    if(my_rank!=0)
+    for(source=0;source<comm_sz;source++)
+    {
+        MPI_Reduce(&local_int,&total_int,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+    }
+   /* if(my_rank!=0)
     {
         MPI_Send(&local_int,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
     }
@@ -42,6 +45,8 @@ int main(void)
             total_int+=local_int;
         }
     }
+   */
+
 
     if(my_rank==0)
     {
