@@ -8,27 +8,20 @@
 #include<stdio.h>
 #include<mpi.h>
 #include<math.h>
-double Trap(double left_endpt,double right_endpt,int trap_count,double base_len);
-void Get_input(int my_rank,int comm_sz,double *a_p,double *b_p,int *n_p);
+#include<stdlib.h>
+double *dual(int my_rank,double *local_start,int n);
+void Get_input(int my_rank,int comm_sz,double *a,int *n);
 
 int main(void)
 {
-    int my_rank,comm_sz,n,local_n;
-    double a,b,h,local_a,local_b;
-    double local_int,total_int;
-    int source;
+    int my_rank,comm_sz,n;
+    double *a;
 
     MPI_Init(NULL,NULL);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
     MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
-    Get_input(my_rank,comm_sz,&a,&b,&n);
-    h=(b-a)/n;
-    local_n=n/comm_sz;
-
-    local_a=a+my_rank*local_n*h;
-    local_b=local_a+local_n*h;
-    local_int=Trap(local_a,local_b,local_n,h);
-
+    Get_input(my_rank,comm_sz,a,&n);
+    dual(my_rank,)
     if(my_rank!=0)
     {
         MPI_Send(&local_int,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
