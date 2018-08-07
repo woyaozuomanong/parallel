@@ -9,81 +9,73 @@
 #include<mpi.h>
 #include<math.h>
 #include<stdlib.h>
-double *dual(int my_rank,double *local_start,int n);
-void Get_input(int my_rank,int comm_sz,double *a,int *n);
+
+#define N 8
+
+void dual(int my_rank,double *local_start,int n);
+void Get_input(int my_rank,int comm_sz,double *a,double *b,int n);
+
 
 int main(void)
 {
-    int my_rank,comm_sz,n;
-    double *a;
+    int my_rank,comm_sz;
+    double a[N];
 
     MPI_Init(NULL,NULL);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
     MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
-    Get_input(my_rank,comm_sz,a,&n);
-    dual(my_rank,)
-    if(my_rank!=0)
+    double b[N/comm_sz];
+    Get_input(my_rank,comm_sz,a,b,N);
+    dual(my_rank,a+N/comm_sz*my_rank,N/comm_sz);
+    if(my_rank==0)
     {
-        MPI_Send(&local_int,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+
+    for(int i=0;i<N;i++)
+    {
+      printf("a%d=%f\n",i,a[i]);
+    }
+      MPI_Gather(b,N/comm_sz,MPI_DOUBLE,a,N/comm_sz,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      for(int i=0;i<N;i++)
+      {
+        printf("%f\n",a[i]);
+      }
     }
     else
     {
-        total_int=local_int;
-        for(source=1;source<comm_sz;source++)
-        {
-            MPI_Recv(&local_int,1,MPI_DOUBLE,source,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-            total_int+=local_int;
-        }
+      MPI_Gather(b,N/comm_sz,MPI_DOUBLE,a,N/comm_sz,MPI_DOUBLE,0,MPI_COMM_WORLD);
     }
 
-    if(my_rank==0)
-    {
-        printf("With n=%d trapezoids,our estimate\n",n);
-        printf("of the integral from %f to %f = %.15e\n",a,b,total_int);
-    }
 
     MPI_Finalize();
     return 0;
 }
 
 
-double Trap(double left_endpt,double right_endpt,int trap_count,double base_len)
+void Get_input(int my_rank,int comm_sz,double *a,double *b,int n)
 {
-    double estimate,x;
-    int i;
-
-    estimate=(left_endpt+right_endpt)/2.0;
-    for(i=1;i<=trap_count-1;i++)
+    if(my_rank==0)
     {
-        x=left_endpt+i*base_len;
-        estimate+=x;
-    }
-    estimate=estimate*base_len;
+      printf("please input %d numbers\n",n);
+      for(int i=0;i<n;i++)
+      {
+        scanf("%f",a+i);
+      }
 
-    return estimate;
+      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,MPI_COMM_WORLD);
+    }
+    else
+    {
+      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,MPI_COMM_WORLD);
+    }
 }
 
 
 
-void Get_input(int my_rank,int comm_sz,double *a_p,double *b_p,int *n_p)
+void dual(int my_rank,double *local_start,int n)
 {
-    int dest;
-
-    if(my_rank==0)
+    int i=0;
+    while(i++!=n)
     {
-        printf("Enter a,b and n\n");
-        scanf("%lf %lf %d",a_p,b_p,n_p);
-        for(dest=1;dest<comm_sz;dest++)
-        {
-            MPI_Send(a_p,1,MPI_DOUBLE,dest,0,MPI_COMM_WORLD);
-            MPI_Send(b_p,1,MPI_DOUBLE,dest,0,MPI_COMM_WORLD);
-            MPI_Send(n_p,1,MPI_INT,dest,0,MPI_COMM_WORLD);
-        } 
-    }
-    else
-    {
-        MPI_Recv(a_p,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(b_p,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(n_p,1,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        *(local_start+i)*=my_rank;
     }
 }
