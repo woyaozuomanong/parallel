@@ -13,23 +13,24 @@
 #define N 8
 
 void dual(int my_rank,double *local_start,int n);
-void Get_input(int my_rank,int comm_sz,double *a,double *b,int n);
+void Get_input(int my_rank,int comm_sz,double *a,double *b,int n,MPI_Comm comm);
 
 
 int main(void)
 {
     int my_rank,comm_sz;
     double a[N];
+    double *b;
 
     MPI_Init(NULL,NULL);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
     MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
-    double b[N/comm_sz];
-    Get_input(my_rank,comm_sz,a,b,N);
-    dual(my_rank,a+N/comm_sz*my_rank,N/comm_sz);
+    b=malloc(N/comm_sz*sizeof(double));
     if(my_rank==0)
     {
-
+    
+    Get_input(my_rank,comm_sz,a,b,N,MPI_COMM_WORLD);
+    dual(my_rank,a+N/comm_sz*my_rank,N/comm_sz);
     for(int i=0;i<N;i++)
     {
       printf("a%d=%f\n",i,a[i]);
@@ -42,16 +43,20 @@ int main(void)
     }
     else
     {
+      
+      Get_input(my_rank,comm_sz,a,b,N,MPI_COMM_WORLD);
+      dual(my_rank,a+N/comm_sz*my_rank,N/comm_sz);
       MPI_Gather(b,N/comm_sz,MPI_DOUBLE,a,N/comm_sz,MPI_DOUBLE,0,MPI_COMM_WORLD);
     }
 
 
     MPI_Finalize();
+    free(b);
     return 0;
 }
 
 
-void Get_input(int my_rank,int comm_sz,double *a,double *b,int n)
+void Get_input(int my_rank,int comm_sz,double *a,double *b,int n,MPI_Comm comm)
 {
     if(my_rank==0)
     {
@@ -61,11 +66,12 @@ void Get_input(int my_rank,int comm_sz,double *a,double *b,int n)
         scanf("%f",a+i);
       }
 
-      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,MPI_COMM_WORLD);
+      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,comm);
+
     }
     else
     {
-      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,MPI_COMM_WORLD);
+      MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,comm);
     }
 }
 
