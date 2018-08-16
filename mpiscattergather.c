@@ -26,9 +26,15 @@ int main(void)
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
     MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
     b=malloc(N/comm_sz*sizeof(double));
-    
+    printf("this is process %d output\n",my_rank);
     Get_input(my_rank,comm_sz,a,b,N,MPI_COMM_WORLD);
-    dual(my_rank,a+N/comm_sz*my_rank,N/comm_sz);
+    for(int i=0;i<N/comm_sz;i++)
+    {
+      printf("b[%d]=%lf\n",i,b[i]);
+    }
+    printf("this is process %d output\n",my_rank);
+    printf("comm_sz=%d\n",comm_sz);
+    dual(my_rank,b,N/comm_sz);
     if(my_rank==0)
     {
     
@@ -66,7 +72,10 @@ void Get_input(int my_rank,int comm_sz,double *a,double *b,int n,MPI_Comm comm)
       }
 
       MPI_Scatter(a,n/comm_sz,MPI_FLOAT,b,n/comm_sz,MPI_FLOAT,0,comm);
-
+      for(int i=0;i<n/comm_sz;i++)
+      {
+        printf("after get_input,b=%lf\n",b[i]);
+      }
     }
     else
     {
@@ -79,8 +88,9 @@ void Get_input(int my_rank,int comm_sz,double *a,double *b,int n,MPI_Comm comm)
 void dual(int my_rank,double *local_start,int n)
 {
     int i=0;
-    while(i++!=n)
+    while(i!=n)
     {
         *(local_start+i)*=my_rank;
+        i++;
     }
 }
