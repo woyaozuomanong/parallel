@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include<stdio.h>
-#include<mpi/mpi.h>
+#include<mpi.h>
 #include<math.h>
 double Trap(double left_endpt,double right_endpt,int trap_count,double base_len);
 void Get_input(int my_rank,int comm_sz,double *a_p,double *b_p,int *n_p);

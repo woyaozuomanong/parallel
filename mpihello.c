@@ -7,7 +7,7 @@
 
 #include<stdio.h>
 #include<string.h>
-#include<mpi/mpi.h>
+#include<mpi.h>
 
 const int MAX_STRING=100;
 
