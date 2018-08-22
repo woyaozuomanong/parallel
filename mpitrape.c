@@ -17,6 +17,7 @@ int main(void)
     double a,b,h,local_a,local_b;
     double local_int,total_int;
     int source;
+    double start,end;
 
     MPI_Init(NULL,NULL);
     MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
@@ -24,6 +25,7 @@ int main(void)
     Get_input(my_rank,comm_sz,&a,&b,&n);
     h=(b-a)/n;
     local_n=n/comm_sz;
+    start=MPI_Wtime();
 
     local_a=a+my_rank*local_n*h;
     local_b=local_a+local_n*h;
@@ -54,6 +56,8 @@ int main(void)
         printf("of the integral from %f to %f = %.15e\n",a,b,total_int);
     }
 
+    end=MPI_Wtime();
+    printf("the total time cost is %lf\n",end-start);
     MPI_Finalize();
     return 0;
 }
