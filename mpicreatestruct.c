@@ -43,7 +43,10 @@ int main(void)
   {
     printf("the name is %s\n",name);
   }
-
+  
+  free(xlabel);
+  free(ylabel);
+  free(name);
 }
 
 
