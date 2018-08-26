@@ -11,11 +11,14 @@ int main(void)
 {
   int my_rank,comm_sz;
   double a[N],b[LOCAL_N];
+  double local_start,local_finish,local_elapsed,elapsed;
 
   MPI_Init(NULL,NULL);
   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
   MPI_Comm_size(MPI_COMM_WORLD,&comm_sz);
+  MPI_Barrier(MPI_COMM_WORLD);
 
+  local_start=MPI_Wtime();
   get_input(my_rank,comm_sz,a,b,N,LOCAL_N,MPI_COMM_WORLD);
   for(int i=0;i<LOCAL_N;i++)
   {
@@ -27,13 +30,18 @@ int main(void)
     printf("this is process %d,b[%d]=%lf\n",my_rank,i,b[i]);
   }
   MPI_Gather(b,LOCAL_N,MPI_DOUBLE,a,LOCAL_N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  local_finish=MPI_Wtime();
+  local_elapsed=local_finish-local_start;
+  MPI_Reduce(&local_elapsed,&elapsed,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
   if(my_rank==0)
   {
     for(int i=0;i<N;i++)
     {
       printf("this is process %d output:a[%d]=%lf\n",my_rank,i,a[i]);
     }
+    printf("Elapsed time=%e seconds\n",elapsed);
   }
+
   return 0;
 }
 
